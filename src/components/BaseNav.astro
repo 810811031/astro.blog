@@ -1,0 +1,175 @@
+---
+import { nav } from '../config';
+import '../styles/BaseNavStyle.css';
+
+const files = await Astro.glob('../pages/**/*.md');
+let navs = [];
+
+nav.forEach(async n => {
+    
+    let current = files.find(f => {
+        return f.url === `${ import.meta.env.BASE_URL }${ n }`;
+    });
+
+    if (!current) return;
+
+    navs.push(current);
+});
+---
+
+<nav>
+    <ul>{
+        navs.map(n =>
+            n.getHeadings().map(head => 
+                <li class={ `level-${ head.depth }` }>{
+                    head.depth === 1 ?
+                        <a class="menu-item" href={ n.url }>{ head.text }</a>:
+                        <a class="menu-item" href={ `${ n.url }#${ head.text.replaceAll(' ', '-') }` } 
+                            style={ `margin-left: ${ 10 * head.depth }px;` }
+                        >
+                            { head.text }
+                        </a>
+                }</li>
+            )
+        )
+    }</ul>
+</nav>
+
+<script>
+window.onload = () => {
+
+    let currentPage;    // 当前页面的 dom 
+    let currentDom;     // 当前子节点的 dom
+    let prevDom;        // 上一个界面对应的菜单元素
+    let nextDom;        // 下一个界面对应的菜单元素
+
+    /**
+     * hash值定位
+     */
+    function Position() {
+
+        let hash = window.location.hash;
+            hash = decodeURIComponent(hash);
+            hash = hash.toLocaleLowerCase();
+            hash = hash.replace(/[\ |\~|\`|\!|\@|\$|\%|\^|\&|\*|\(|\)|\_|\+|\=|\||\\|\[|\]|\{|\}|\;|\:|\"|\'|\,|\<|\.|\>|\/|\?]/g,"");
+        
+        let domTop = 0;
+
+        try {
+
+            domTop = (document.querySelector(hash) as any).offsetTop;
+
+            domTop = domTop - 80;
+            
+        } catch(err) {}
+        
+        setTimeout(() => window.scrollTo(0 , domTop), 0);
+
+    }
+    
+    /**
+     * 渲染当前选中的菜单
+     */
+    function RenderCurrentTip() {
+        const host = 'http://' + window.location.host;
+        const pathname = window.location.pathname;
+        const hashname = window.location.hash;
+
+        const menuItem = Array.from(document.getElementsByClassName('menu-item'));
+
+        menuItem.forEach((menu: any) => {
+            if (menu.href === host + pathname) currentPage = menu;
+            if (menu.href === host + pathname + hashname) currentDom = menu;
+
+            menu.className = 'menu-item';
+        });
+
+        currentPage.className='menu-item font-color';
+        currentDom.className = 'menu-item font-color';
+        
+        JudgeFooterButton();
+
+    }
+
+    /**
+     * 判断按钮是否显示
+     */
+    function JudgeFooterButton() {
+
+        const parent = currentPage.parentElement;
+
+        prevDom = getBortherElement(parent, 'previousElementSibling');
+
+        nextDom = getBortherElement(parent, 'nextElementSibling');
+
+        hiddenOrRender(prevDom, 'prev');
+
+        hiddenOrRender(nextDom, 'next');
+
+        listenElementClick('prev', prevDom);
+
+        listenElementClick('next', nextDom);
+
+    }
+
+    /**
+     * 向上或向下寻找兄弟元素
+     */
+    function getBortherElement(parent, type) {
+
+        const element = parent[type];
+
+        if (!element) return null;
+
+        if (element.className.includes('level-1')) {
+            return element;
+        } else {
+            return getBortherElement(element, type);
+        }
+        
+    }
+
+    /**
+     * 隐藏或渲染底部按钮
+     */
+    function hiddenOrRender(target, id) {
+
+        const dom = document.getElementById(id);
+
+        dom.parentElement.style.display = target ? 'flex' : 'none';
+
+        if (!target) return ;
+
+        const text = target.getElementsByTagName('a')[0].text;
+
+        dom.innerText = text;
+
+    }
+
+    /**
+     * 监听元底部按钮击事件
+     */
+    function listenElementClick(id, dom) {
+
+        if (!dom) return;
+
+        document.getElementById(id).onclick = function () {
+            dom.getElementsByTagName('a')[0].click();
+        }
+    }
+
+    Position();
+
+    RenderCurrentTip();
+
+    window.addEventListener('hashchange', () => {
+        Position();
+
+        RenderCurrentTip();
+    }, false);
+
+
+    
+
+}
+</script>

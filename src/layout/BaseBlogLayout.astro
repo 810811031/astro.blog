@@ -1,0 +1,42 @@
+---
+import BaseHeader from "../components/BaseHeader.astro";
+import Nav from "../components/BaseNav.astro";
+import BaseTopTitle from "../components/BaseTopTitle.astro";
+import BaseFooter from "../components/BaseFooter.astro";
+import { showHeader } from "../config";
+import "github-markdown-css";
+
+const { content } = Astro.props;
+---
+
+<html lang="en">
+    <head>
+        <BaseHeader />
+        <title>{ content.title }</title>
+    </head>
+    <body>
+        <!-- 顶部标题栏 -->
+        {
+            showHeader ?
+                <BaseTopTitle /> : null
+        }
+
+        <!-- 菜单栏 -->
+        <Nav />
+
+        <!-- 主体部分 -->
+        <div class="main">
+            
+            <div style="height: 20px"></div>
+
+            <div class="markdown-body" style="width: 860px;margin: 20px auto;">
+                <slot />
+            </div>
+    
+        </div>
+
+        <!-- 底部 -->
+        <BaseFooter />
+        
+    </body>
+</html>
