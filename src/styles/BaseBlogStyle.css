@@ -5,6 +5,12 @@
     margin-left: 200px;
 }
 
+.main-center {
+    width: 100%;
+    height: 100%;
+    padding-bottom: 50px;
+}
+
 html, body {
     scroll-behavior: smooth;
 }

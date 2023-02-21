@@ -3,7 +3,7 @@ import BaseHeader from "../components/BaseHeader.astro";
 import Nav from "../components/BaseNav.astro";
 import BaseTopTitle from "../components/BaseTopTitle.astro";
 import BaseFooter from "../components/BaseFooter.astro";
-import { showHeader } from "../config";
+import { showHeader, showNav } from "../config";
 import "github-markdown-css";
 
 const { content } = Astro.props;
@@ -22,10 +22,14 @@ const { content } = Astro.props;
         }
 
         <!-- 菜单栏 -->
-        <Nav />
+        {
+            showNav ? 
+                <Nav /> : null
+        }
+        
 
         <!-- 主体部分 -->
-        <div class="main">
+        <div class={ showNav ? 'main' : 'main-center' }>
             
             <div style="height: 20px"></div>
 
@@ -36,7 +40,10 @@ const { content } = Astro.props;
         </div>
 
         <!-- 底部 -->
-        <BaseFooter />
+        {
+            showNav ? 
+                <BaseFooter /> : null
+        }
         
     </body>
 </html>

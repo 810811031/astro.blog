@@ -84,8 +84,10 @@ window.onload = () => {
             menu.className = 'menu-item';
         });
 
+        if (!currentPage) currentPage = menuItem[0];
+
         currentPage.className='menu-item font-color';
-        currentDom.className = 'menu-item font-color';
+        currentDom && (currentDom.className = 'menu-item font-color');
         
         JudgeFooterButton();
 
